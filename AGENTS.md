@@ -6,6 +6,6 @@
 - Keep stdout valid ACP JSONL. Send diagnostics to stderr and never log credentials.
 - Preserve upstream licenses and report only capabilities that have been verified.
 - Run `npm run build` and `npm test` for adapter or distribution changes. Use real-model smoke tests only when the change needs them.
-- Before publication, review credential handling, diagnostics, trust boundaries, approvals, dependency advisories, and capability claims. Add regression coverage for security fixes and test the extracted release artifacts.
+- Before publication, review credential handling, diagnostics, trust boundaries, approvals, dependency and bundled-runtime advisories, and capability claims. Add regression coverage for security fixes and test the extracted release artifacts. npm audit does not cover the bundled Node executable.
 - Run `npm run audit:public` and `npm audit --omit=dev --audit-level=moderate` before publishing. These checks supplement manual review; do not describe them as a complete security audit.
 - Use neutral public branch names and omit incidental development-tool metadata. Preserve required notices and truthful technical references.

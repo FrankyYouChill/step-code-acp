@@ -20,6 +20,9 @@ try {
     if (name !== 'relocated package with spaces') await rename(join(temporary,name),join(relocated,name));
   }
   const binary = join(relocated, 'step-code-acp');
+  const runtime=spawnSync(join(relocated,'runtime/node'),['--version'],{encoding:'utf8'});
+  assert.equal(runtime.status,0);
+  assert.equal(runtime.stdout.trim(),'v24.22.2');
   const run = spawnSync(process.execPath, [join(root,'smoke-acp.mjs'),'--simulate-failure'], {env:{...process.env,STEP_CODE_ACP_BINARY:binary},encoding:'utf8',timeout:120000});
   assert.equal(run.status, 0, run.stderr || run.stdout);
   const bundledZod=JSON.parse(await readFile(join(relocated,'node_modules/zod/package.json'),'utf8'));

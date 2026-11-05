@@ -11,6 +11,10 @@ Do not submit API keys, bearer tokens, home-directory account files or full conv
 
 Security fixtures use fake credentials and no model access. They cover malformed input, oversized collections, nesting, byte limits, failed requests, split stderr credentials, and failure propagation. CI also checks dependency advisories and public files/metadata. These are focused safeguards, not a complete security audit or a guarantee against every resource-exhaustion attack.
 
+## Bundled runtime in v0.2.3
+
+Release packages use Node 24.22.2, the current Node 24 LTS patch release at preparation time, including the [October 2026 security updates](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases). Source installs also require Node 24.22.2 or newer. Package validation checks the actual bundled executable version. npm audit does not audit the Node runtime; review [Node security announcements](https://nodejs.org/en/blog/vulnerability) before future releases and keep the runtime pin current.
+
 The adapter is a local child process, not a public network service. Run it only with trusted clients, Step Code installations and projects. Project content, prompts and tool results can be sent to the model providers configured in Step Code and any explicitly delegated T3 tasks. This project adds no hosted proxy or analytics service. Do not expose T3's local MCP endpoint or share its session-scoped bearer token.
 
-Earlier releases retain their original behavior. Upgrade to v0.2.2 or later for these fixes; do not assume a source update changes an already extracted archive.
+Earlier releases retain their original behavior and bundled runtimes. Use v0.2.3 or later for the combined adapter and runtime updates; do not assume a source update changes an already extracted archive.

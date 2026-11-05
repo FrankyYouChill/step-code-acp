@@ -5,7 +5,7 @@ on:
       tag:
         description: Release tag matching package.json
         required: true
-        default: v0.2.2
+        default: v0.2.3
 permissions:
   contents: read
 jobs:
@@ -20,7 +20,7 @@ jobs:
           ref: ${{ inputs.tag }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 24.15.0
+          node-version: 24.22.2
           cache: npm
       - name: Check the release version
         env:

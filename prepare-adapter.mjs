@@ -2,8 +2,9 @@ import { readFile, writeFile, mkdir, chmod, cp, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-if (Number(process.versions.node.split('.')[0]) < 24) {
-  throw new Error('Node.js 24 or newer is required. Select Node 24 in this terminal before building.');
+const [nodeMajor,nodeMinor,nodePatch] = process.versions.node.split('.').map(Number);
+if (nodeMajor < 24 || (nodeMajor === 24 && (nodeMinor < 22 || (nodeMinor === 22 && nodePatch < 2)))) {
+  throw new Error('Node.js 24.22.2 or newer is required. Select an updated Node LTS runtime before building.');
 }
 
 const root = dirname(fileURLToPath(import.meta.url));

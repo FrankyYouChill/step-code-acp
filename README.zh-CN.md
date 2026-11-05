@@ -47,7 +47,7 @@ step
 
 ### 方式 B：从 GitHub 源码安装
 
-需要 Git、Node.js 24 或更新版本，以及 npm。选择一个会长期保留的位置：
+需要 Git、Node.js 24.22.2 或更新版本，以及 npm。选择一个会长期保留的位置：
 
 ```sh
 mkdir -p ~/Projects
@@ -59,7 +59,7 @@ npm ci --ignore-scripts
 npm run setup
 ```
 
-`node --version` 应显示 v24 或更高版本。安装器会生成启动入口，并打印 **Executable 的完整路径**，通常位于 `~/.local/bin/step-code-acp`。
+`node --version` 应显示 v24.22.2 或更高版本。安装器会生成启动入口，并打印 **Executable 的完整路径**，通常位于 `~/.local/bin/step-code-acp`。
 
 复制本机实际输出的完整路径。保留下载的文件夹；移动它或更换 Node 安装位置后，重新运行 setup。
 
@@ -94,13 +94,13 @@ npm run setup
 
 ## 安全与数据流
 
-请使用 v0.2.2 或更新版本：它升级了存在安全公告的 Zod 依赖，限制 ACP 输入的大小和结构，并避免在诊断日志中输出原始请求或 Step Code RPC 的原始 stderr。交互式登录仍使用 Step Code 自己的界面。具体限制和测试范围见 [SECURITY.md](SECURITY.md)。旧的解压发行包不会随源码更新自动修复。
+请使用 v0.2.3 或更新版本：它升级了存在安全公告的 Zod 依赖，限制 ACP 输入的大小和结构，并避免在诊断日志中输出原始请求或 Step Code RPC 的原始 stderr。交互式登录仍使用 Step Code 自己的界面。具体限制和测试范围见 [SECURITY.md](SECURITY.md)。旧的解压发行包不会随源码更新自动修复。
 
 本地运行适配器不代表模型也在本地运行。提示词、项目内容和工具结果可能发送给 Step Code 以及你委派的 T3 子任务所配置的模型服务。只在可信客户端、项目和 Step Code 安装中使用，不要公开本地 MCP 端点或其会话令牌。
 
 ## 兼容范围与协作
 
-本机验证过 macOS、Node 24.15.0、T3 0.1.7、Step Code 0.1.6 和 Step 5 Preview；Linux 发行包也通过了构建与启动检查。0.1.7 是已验证的 T3 版本，基础 ACP 接入没有写死该版本。协议、Step Code RPC 或 T3 MCP 工具变化时，仍可能需要适配和复测。
+本机验证过 macOS、Node 24.22.2、T3 0.1.7、Step Code 0.1.6 和 Step 5 Preview；Linux 发行包也通过了构建与启动检查。0.1.7 是已验证的 T3 版本，基础 ACP 接入没有写死该版本。协议、Step Code RPC 或 T3 MCP 工具变化时，仍可能需要适配和复测。
 
 T3 提供会话内 MCP 工具时，Step Code 可以通过本项目的桥接扩展发现能力，并委派 OpenCode 等 T3 子任务。子任务属于 T3 调度，实际可用性取决于客户端、模型访问与工具审批。完整恢复、回滚、取消和长任务生命周期尚未全面验证，自由文本 input/editor 请求暂不支持。
 

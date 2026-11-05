@@ -4,6 +4,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 if (process.platform === 'win32') throw new Error('Use macOS or Linux for this preview.');
+const [nodeMajor,nodeMinor,nodePatch]=process.versions.node.split('.').map(Number);
+if(nodeMajor<24 || (nodeMajor===24 && (nodeMinor<22 || (nodeMinor===22 && nodePatch<2)))) throw new Error('Node.js 24.22.2 or newer is required.');
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const localBin = join(homedir(), '.local', 'bin');
 const link = join(localBin, 'step-code-acp');

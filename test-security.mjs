@@ -9,6 +9,7 @@ import {once} from 'node:events';
 import {setTimeout as delay} from 'node:timers/promises';
 import {z} from 'zod/v4';
 import {INPUT_LIMITS, ndJsonStream} from './acp-transport.mjs';
+import pkg from './package.json' with {type:'json'};
 
 const root = dirname(fileURLToPath(import.meta.url));
 
@@ -75,7 +76,7 @@ readline.createInterface({input:process.stdin}).on('line', () => {});
     child.stdin.write('123\n[]\n{"jsonrpc":"2.0","id":[],"method":"initialize"}\n');
     // Normal UTF-8 requests must remain compatible with the bounded parser.
     const first = await request(1,'initialize',{protocolVersion:1,clientInfo:{name:'fixture-\u00e9',version:'1'},clientCapabilities:{}});
-    assert.equal(first.result.agentInfo.version,'0.2.2');
+    assert.equal(first.result.agentInfo.version,pkg.version);
     const invalid = await request(2,'session/prompt',{sessionId:'missing',prompt:[{type:'text',text:privatePrompt}]});
     assert.ok(invalid.error);
     const oversized = await request(3,'initialize',{protocolVersion:1,clientCapabilities:{},_meta:{values:Array(INPUT_LIMITS.collection+1).fill(secret)}});

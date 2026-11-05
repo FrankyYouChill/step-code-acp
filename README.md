@@ -6,7 +6,7 @@ This community adapter connects ACP to Step Code's RPC interface. Step Code hand
 
 [Chinese guide](README.zh-CN.md)
 
-**Community preview:** independently maintained, built on [pi-acp 0.0.34](https://github.com/svkozak/pi-acp). This is not an official StepFun or T3 release. See [architecture and limitations](docs/architecture.md), [Registry status](docs/registry.md), and the [security notes](SECURITY.md). Use v0.2.2 or later for the input-validation and diagnostic-privacy fixes.
+**Community preview:** independently maintained, built on [pi-acp 0.0.34](https://github.com/svkozak/pi-acp). This is not an official StepFun or T3 release. See [architecture and limitations](docs/architecture.md), [Registry status](docs/registry.md), and the [security notes](SECURITY.md). Use v0.2.3 or later for the input-validation and diagnostic-privacy fixes.
 
 ## 1. Install and sign in to Step Code
 
@@ -30,14 +30,14 @@ The executable is **`step-code-acp` at the root of the extracted directory**. Us
 
 ### From a Git checkout
 
-Requires Git, Node.js **24+**, and npm. macOS is locally validated; Linux is checked through the release workflow. Windows is not supported by this preview.
+Requires Git, Node.js **24.22.2+**, and npm. macOS is locally validated; Linux is checked through the release workflow. Windows is not supported by this preview.
 
 ```sh
 mkdir -p ~/Projects
 cd ~/Projects
 git clone https://github.com/FrankyYouChill/step-code-acp.git
 cd step-code-acp
-node --version  # must be v24 or newer
+node --version  # must be v24.22.2 or newer
 npm ci --ignore-scripts
 npm run setup
 ```
@@ -83,7 +83,7 @@ Prompts, project content and tool results may reach the model providers configur
 
 ## Compatibility and verification
 
-Locally verified with macOS, Node 24.15.0, T3 Code 0.1.7, Step Code 0.1.6, and Step 5 Preview. T3 0.1.7 is a tested version, not a hardcoded requirement for the ACP connection. Protocol, RPC, or MCP-tool changes may still require updates and testing. Other client/version combinations are not guaranteed.
+Locally verified with macOS, Node 24.22.2, T3 Code 0.1.7, Step Code 0.1.6, and Step 5 Preview. T3 0.1.7 is a tested version, not a hardcoded requirement for the ACP connection. Protocol, RPC, or MCP-tool changes may still require updates and testing. Other client/version combinations are not guaranteed.
 
 ```sh
 npm run build

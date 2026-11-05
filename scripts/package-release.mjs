@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+if (process.version !== 'v24.22.2') throw new Error('Release packages require the reviewed Node 24.22.2 runtime.');
 const target = `${process.platform}-${process.arch === 'arm64' ? 'aarch64' : process.arch === 'x64' ? 'x86_64' : process.arch}`;
 if (!['darwin-aarch64', 'darwin-x86_64', 'linux-aarch64', 'linux-x86_64'].includes(target)) throw new Error('Unsupported release target: ' + target);
 const temporary = await mkdtemp(join(tmpdir(), 'step-code-acp-package-'));
