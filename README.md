@@ -4,7 +4,7 @@ Use your installed **Step Code** agent in **T3 Code** and other ACP clients.
 
 This community adapter connects ACP to Step Code's RPC interface. Step Code handles the actual coding work, model access, tools, and credentials. T3 provides the project and conversation interface, plus delegation tools when available.
 
-![Setup and runtime flow](assets/setup-flow.svg)
+[Chinese guide](README.zh-CN.md)
 
 **Community preview:** independently maintained, built on [pi-acp 0.0.34](https://github.com/svkozak/pi-acp). This is not an official StepFun or T3 release. See [architecture and limitations](docs/architecture.md), [Registry status](docs/registry.md), and the [dependency advisory](SECURITY.md).
 
@@ -100,6 +100,6 @@ For a checkout installation, run `npm run uninstall` to remove only the executab
 
 ## Contributing
 
-Public-facing documentation, diagrams, release notes, issues, and pull requests are written in English. Keep stdout valid ACP JSONL, send diagnostics to stderr, preserve upstream notices, and never commit credentials or conversation logs. Report capabilities and validation results accurately.
+Public-facing documentation, release notes, issues, and pull requests are written in English, with a separate Chinese guide available. Keep stdout valid ACP JSONL, send diagnostics to stderr, preserve upstream notices, and never commit credentials or conversation logs. Report capabilities and validation results accurately.
 
 Code: MIT. [Third-party and brand notices](THIRD_PARTY_NOTICES.md).

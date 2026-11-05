@@ -17,7 +17,7 @@ const dist = join(root, 'dist');
 await mkdir(staging);
 await mkdir(dist, {recursive:true});
 try {
-  for (const path of ['.generated/adapter.mjs','node_modules','package.json','package-lock.json','step-rpc.mjs','t3-mcp-client.mjs','t3-mcp-extension.mjs','LICENSE','THIRD_PARTY_NOTICES.md','README.md','SECURITY.md','registry/step-code-acp/icon.svg']) {
+  for (const path of ['.generated/adapter.mjs','node_modules','package.json','package-lock.json','step-rpc.mjs','t3-mcp-client.mjs','t3-mcp-extension.mjs','LICENSE','THIRD_PARTY_NOTICES.md','README.md','README.zh-CN.md','docs','SECURITY.md','registry/step-code-acp/icon.svg']) {
     await cp(join(root, path), join(staging, path), {recursive:true,verbatimSymlinks:true});
   }
   await mkdir(join(staging, 'runtime'));
