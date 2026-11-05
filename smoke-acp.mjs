@@ -36,7 +36,7 @@ readline.createInterface({input:process.stdin}).on('line', line => {
   await chmod(mock, 0o755);
   env.STEP_CODE_BINARY = mock;
 }
-const child = spawn(join(root, 'bin/step-code-acp'), [], {
+const child = spawn(process.env.STEP_CODE_ACP_BINARY || join(root, 'bin/step-code-acp'), [], {
   cwd, stdio: ['pipe', 'pipe', 'pipe'], detached: true, env,
 });
 const pending = new Map();
@@ -76,7 +76,7 @@ child.stdout.on('data', data => {
 child.stderr.on('data', d => { stderr = (stderr + d.toString()).slice(-8000); });
 child.on('exit', code => { for (const item of pending.values()) item.reject(new Error('Adapter exited: ' + code)); pending.clear(); });
 try {
-  const initialize = await request('initialize', { protocolVersion: 1, clientInfo: { name: 'step-code-t3-smoke', version: '0.1.0' }, clientCapabilities: {} });
+  const initialize = await request('initialize', { protocolVersion: 1, clientInfo: { name: 'step-code-t3-smoke', version: '0.1.0' }, clientCapabilities: {_meta:{'terminal-auth':true}} });
   console.log(JSON.stringify({ phase: 'initialize', ...initialize }));
   const session = await request('session/new', { cwd, mcpServers: [] });
   console.log(JSON.stringify({ phase: 'session', sessionId: session.sessionId, models: session.models }));

@@ -25,6 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-T3 Code and Step Code are separate upstream projects. They are not bundled or redistributed. The optional branding helper reads assets from the user’s own installed T3 app.
+T3 Code and Step Code are separate upstream projects. They are not bundled or redistributed.
 
-The Step logo asset is supplied for identification of Step Code. Brand assets are excluded from this project’s MIT code license. Source: https://avatars.githubusercontent.com/u/178004800?s=256&v=4 (provided by the project owner). No ownership of the Step mark is claimed.
+The Step logo asset is supplied for identification of Step Code. Brand assets are excluded from this project’s MIT code license. The Registry SVG is a monochrome vector rendering of the mark in https://avatars.githubusercontent.com/u/178004800?s=256&v=4, provided by the project owner. No ownership of the Step mark is claimed.

@@ -1,15 +1,11 @@
-# Public distribution and Registry
+# ACP Registry status
 
-This GitHub repository is usable independently of Registry membership. Users install the checkout and add a local ACP command in T3 today.
+**Status: preparing the initial submission.** This page will link the review request once it is open. A published release does not imply Registry acceptance or endorsement.
 
-Registry applications are Pull Requests to [agentclientprotocol/registry](https://github.com/agentclientprotocol/registry), reviewed by that project's maintainers. Follow its current [CONTRIBUTING.md](https://github.com/agentclientprotocol/registry/blob/main/CONTRIBUTING.md) and [FORMAT.md](https://github.com/agentclientprotocol/registry/blob/main/FORMAT.md).
+The proposed entry is `step-code-acp`, displayed as **Step Code ACP**, and points to this repository's pinned release archives. Users must have Step Code installed and configure their own account access. The adapter declares terminal authentication and launches the installed Step Code CLI for sign-in.
 
-Before submitting this preview:
+The entry and icon are maintained under `registry/step-code-acp/`. The icon uses the Registry's required 16×16 monochrome `currentColor` SVG format, based on the Step mark supplied by the project owner. Brand ownership remains with its owner.
 
-1. Pick a stable agent ID and release a reproducible distribution through an accepted pinned binary, npx or uvx method. This project currently has only Git-checkout setup and does not claim to be an npm package release.
-2. Provide `agent.json` with version, description, repository, authors, license URL and supported distribution.
-3. Provide the required 16×16 monochrome `currentColor` SVG icon. The bundled avatar JPEG is useful for the local overlay but is **not** a compliant Registry SVG.
-4. Verify authentication, startup and the supported protocol/capability matrix on a clean machine. Be explicit that this adapter relies on an installed Step Code CLI and existing account access.
-5. Fork the Registry, add the entry, run its checks, and open a PR. This repository's existence does not imply approval or endorsement.
+Submission goes to [agentclientprotocol/registry](https://github.com/agentclientprotocol/registry) as a pull request. Follow its [contribution guide](https://github.com/agentclientprotocol/registry/blob/main/CONTRIBUTING.md) and [authentication requirements](https://github.com/agentclientprotocol/registry/blob/main/AUTHENTICATION.md).
 
-Native T3 local-provider custom icons are a separate upstream contribution to [pingdotgg/t3code](https://github.com/pingdotgg/t3code). A reusable icon field should be generic; avoid baking a Step Code agent-ID exception into T3's generic ACP adapter. The local overlay remains optional while that upstream capability is unavailable.
+Until the entry is accepted and published, use a release archive or a Git checkout and add a Local ACP command in T3. Local commands may display the generic ACP icon. Once available through the Registry, clients can use its published icon through their supported Registry integration.

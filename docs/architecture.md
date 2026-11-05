@@ -8,7 +8,7 @@
 
 Normal adapter state uses `~/.stepcode/t3-acp/`; `STEP_CODE_ACP_HOME` can select an isolated mapping directory. Step Code itself still controls its own native state and credentials.
 
-The optional macOS frontend helper serves only T3 client assets from the user's installed ASAR, with one version/hash-checked shared icon component substitution. It runs on loopback port 4318 with no backend forwarding, no shell endpoint and no remote binding. `branding.json` maps local ACP display names to bundled raster identification assets. The original app is read-only. No T3 frontend bundle is committed. This is a temporary, version-specific compatibility layer, not a native T3 custom-icon API.
+Distribution packages include a Node runtime and the pinned dependencies. Runtime asset paths resolve relative to the extracted package, so packages can be relocated without rebuilding. Step Code itself must be installed and configured separately. Registry metadata and the monochrome SVG icon live in `registry/step-code-acp/`.
 
 ## Known limits
 
@@ -19,5 +19,4 @@ The optional macOS frontend helper serves only T3 client assets from the user's 
 - T3 owns the delegated tasks. Native harness lineage has no general portable mapping in this preview.
 - Provider/model service errors remain errors; the adapter must not mark a failed turn successful.
 - macOS is the validated platform; Windows is unsupported. Linux ACP paths are supported by the implementation but need user testing.
-- The optional branding helper depends on the exact verified T3 0.1.7 main bundle. It intentionally fails on unverified bundles and uses a development frontend origin.
-- There is no npm release or ACP Registry listing yet; use the documented Git checkout installation.
+- Registry availability depends on review and merge by its maintainers. Check the Registry status document before expecting a searchable entry.

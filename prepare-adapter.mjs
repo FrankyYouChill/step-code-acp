@@ -21,10 +21,9 @@ function patch(before, after) {
 
 // Keep the upstream adapter and its license. Forward only session-scoped local
 // T3 HTTP MCP configuration through the child environment, never a config file.
-const extension = join(root, 't3-mcp-extension.mjs');
 patch('mcpCapabilities: { http: false, sse: false },', 'mcpCapabilities: { http: true, sse: false },');
 patch('const args = ["--mode", "rpc", "--no-themes"];',
-  'const args = ["--mode", "rpc", "--no-themes"];\n    if (params.mcpServers?.some(server => server.name === "t3-code")) args.push("--extension", ' + JSON.stringify(extension) + ');');
+  'const args = ["--mode", "rpc", "--no-themes"];\n    if (params.mcpServers?.some(server => server.name === "t3-code")) args.push("--extension", stepAdapterFileURLToPath(new URL("t3-mcp-extension.mjs", stepAdapterRoot)));');
 patch('env: process.env\n    });',
   'env: { ...process.env, STEP_CODE_T3_MCP_SERVERS: JSON.stringify(params.mcpServers ?? []) }\n    });');
 patch('cwd: params.cwd,\n        piCommand: params.piCommand',
@@ -40,6 +39,8 @@ patch('title: "pi ACP adapter",', 'title: "Step Code (local ACP adapter)",');
 patch('return join(homedir(), ".pi", "pi-acp");', 'return process.env.STEP_CODE_ACP_HOME || join(homedir(), ".stepcode", "t3-acp");');
 patch('name: "Launch pi in the terminal",', 'name: "Open Step Code in a terminal",');
 patch('label: "Launch pi"', 'label: "Open Step Code"');
+patch('const isJs = argv1.endsWith(".js");', 'const isJs = /\\.(?:mjs|cjs|js)$/.test(argv1);');
+patch('return { command: "pi-acp", args: ["--terminal-login"] };', 'return { command: "step-code-acp", args: ["--terminal-login"] };');
 patch('description: "Start pi in an interactive terminal to configure API keys or login",',
       'description: "Open the installed Step Code CLI to configure its account",');
 source = source.replaceAll('".pi"', '".stepcode"');
@@ -86,8 +87,13 @@ patch('this.pendingTurn?.resolve(reason);\n    this.pendingTurn = null;', `const
 patch('void this.settleTurn();', 'void this.settleTurn(ev);');
 patch('this.pendingTurn?.resolve(reason);\n        }', 'if (this.cancelRequested) this.pendingTurn?.resolve("cancelled");\n          else this.pendingTurn?.reject(RequestError2.internalError({}, String(err?.message ?? err)));\n        }');
 
-const wrapper = join(bin, 'step-code-rpc');
-source = source.replace('#!/usr/bin/env node\n', `// Derived from pi-acp ${version} (MIT); see node_modules/pi-acp/LICENSE.\nprocess.env.PI_ACP_PI_COMMAND = ${JSON.stringify(wrapper)};\nprocess.env.PATH = ${JSON.stringify(dirname(process.execPath))} + ":" + (process.env.PATH || "");\n`);
+source = source.replace('#!/usr/bin/env node\n', `// Derived from pi-acp ${version} (MIT); see node_modules/pi-acp/LICENSE.
+import { fileURLToPath as stepAdapterFileURLToPath } from 'node:url';
+import { dirname as stepAdapterDirname } from 'node:path';
+const stepAdapterRoot = new URL('../', import.meta.url);
+process.env.PI_ACP_PI_COMMAND = stepAdapterFileURLToPath(new URL('bin/step-code-rpc', stepAdapterRoot));
+process.env.PATH = stepAdapterDirname(process.execPath) + ':' + (process.env.PATH || '');
+`);
 await writeFile(join(generated, 'adapter.mjs'), source);
 const quote = value => "'" + value.replaceAll("'", "'\\''") + "'";
 for (const [name, target] of [['step-code-acp', join(generated, 'adapter.mjs')], ['step-code-rpc', join(root, 'step-rpc.mjs')]]) {

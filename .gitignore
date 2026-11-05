@@ -6,5 +6,4 @@ verification/
 *.log
 *.env
 .env*
-Launch T3 with Step Code icon.command
-T3 with Step Code.app/
+dist/
