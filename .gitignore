@@ -1,0 +1,10 @@
+node_modules/
+.generated/
+bin/
+verification/
+.DS_Store
+*.log
+*.env
+.env*
+Launch T3 with Step Code icon.command
+T3 with Step Code.app/

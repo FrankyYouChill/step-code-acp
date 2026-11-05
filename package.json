@@ -1,0 +1,23 @@
+{
+  "name": "@frankyyouchill/step-code-acp",
+  "version": "0.1.0",
+  "description": "Community ACP adapter for the installed Step Code CLI, with a session-scoped T3 orchestration bridge",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "author": "FrankyYouChill",
+  "repository": { "type": "git", "url": "https://github.com/FrankyYouChill/step-code-acp.git" },
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "build": "node prepare-adapter.mjs",
+    "setup": "npm run build && node scripts/install.mjs",
+    "uninstall": "node scripts/install.mjs --uninstall",
+    "test": "node --test test-t3-mcp.mjs test-branding.mjs && node smoke-acp.mjs --simulate-failure",
+    "smoke": "node smoke-acp.mjs",
+    "smoke:mcp": "node smoke-t3-mcp.mjs",
+    "t3:check": "node scripts/t3-branding.mjs check",
+    "t3:launch": "node scripts/t3-branding.mjs launch",
+    "t3:stop": "node scripts/t3-branding.mjs stop"
+  },
+  "dependencies": { "pi-acp": "0.0.34" }
+}

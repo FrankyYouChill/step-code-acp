@@ -1,0 +1,98 @@
+import { readFile, writeFile, mkdir, chmod } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+if (Number(process.versions.node.split('.')[0]) < 24) {
+  throw new Error('Node.js 24 or newer is required. Select Node 24 in this terminal before building.');
+}
+
+const root = dirname(fileURLToPath(import.meta.url));
+const generated = join(root, '.generated');
+const bin = join(root, 'bin');
+await mkdir(generated, { recursive: true });
+await mkdir(bin, { recursive: true });
+let source = await readFile(join(root, 'node_modules/pi-acp/dist/index.js'), 'utf8');
+const version = JSON.parse(await readFile(join(root, 'node_modules/pi-acp/package.json'), 'utf8')).version;
+if (version !== '0.0.34') throw new Error('Review compatibility patches before changing pi-acp version');
+function patch(before, after) {
+  if (!source.includes(before)) throw new Error('Upstream adapter changed; cannot apply patch: ' + before.slice(0, 70));
+  source = source.replace(before, after);
+}
+
+// Keep the upstream adapter and its license. Forward only session-scoped local
+// T3 HTTP MCP configuration through the child environment, never a config file.
+const extension = join(root, 't3-mcp-extension.mjs');
+patch('mcpCapabilities: { http: false, sse: false },', 'mcpCapabilities: { http: true, sse: false },');
+patch('const args = ["--mode", "rpc", "--no-themes"];',
+  'const args = ["--mode", "rpc", "--no-themes"];\n    if (params.mcpServers?.some(server => server.name === "t3-code")) args.push("--extension", ' + JSON.stringify(extension) + ');');
+patch('env: process.env\n    });',
+  'env: { ...process.env, STEP_CODE_T3_MCP_SERVERS: JSON.stringify(params.mcpServers ?? []) }\n    });');
+patch('cwd: params.cwd,\n        piCommand: params.piCommand',
+  'cwd: params.cwd,\n        mcpServers: params.mcpServers,\n        piCommand: params.piCommand');
+patch('cwd,\n          sessionPath: stored.sessionFile,',
+  'cwd,\n          mcpServers: opts?.mcpServers ?? [],\n          sessionPath: stored.sessionFile,');
+patch('child.stderr.on("data", () => {\n    });', String.raw`child.stderr.on("data", (chunk) => {
+      const clean = String(chunk).replace(/Bearer\s+[^\s"\\]+/gi, "Bearer [redacted]").replace(/sk-[A-Za-z0-9_-]+/g, "[redacted]");
+      process.stderr.write(clean);
+    });`);
+patch('name: pkg.name ?? "pi-acp",', 'name: "step-code-acp",');
+patch('title: "pi ACP adapter",', 'title: "Step Code (local ACP adapter)",');
+patch('return join(homedir(), ".pi", "pi-acp");', 'return process.env.STEP_CODE_ACP_HOME || join(homedir(), ".stepcode", "t3-acp");');
+patch('name: "Launch pi in the terminal",', 'name: "Open Step Code in a terminal",');
+patch('label: "Launch pi"', 'label: "Open Step Code"');
+patch('description: "Start pi in an interactive terminal to configure API keys or login",',
+      'description: "Open the installed Step Code CLI to configure its account",');
+source = source.replaceAll('".pi"', '".stepcode"');
+patch(`const quietStartup = getQuietStartup(params.cwd);
+    const updateNotice = buildUpdateNotice();
+    const preludeText = quietStartup ? updateNotice ? updateNotice + "\\n" : "" : buildStartupInfo({
+      cwd: params.cwd,
+      fileCommands,
+      updateNotice
+    });`, 'const preludeText = "Step Code · local ACP compatibility adapter\\n";');
+patch('const rl = readline.createInterface({ input: child.stdout });', `const rl = {
+      on(_event, callback) {
+        let text = "";
+        child.stdout.setEncoding("utf8");
+        child.stdout.on("data", chunk => {
+          text += chunk;
+          let end;
+          while ((end = text.indexOf("\\n")) !== -1) {
+            const line = text.slice(0, end).replace(/\\r$/, "");
+            text = text.slice(end + 1);
+            callback(line);
+          }
+        });
+      }
+    };`);
+patch('this.cancelRequested = false;\n    this.inAgentLoop = false;\n    this.pendingTurn',
+      'this.cancelRequested = false;\n    this.stepFailure = null;\n    this.inAgentLoop = false;\n    this.pendingTurn');
+patch('case "message_update": {', `case "message_end": {
+        const message = ev.message;
+        if (message?.role === "assistant" && message.errorMessage && message.stopReason !== "aborted") {
+          this.stepFailure = String(message.errorMessage);
+        }
+        break;
+      }
+      case "message_update": {`);
+patch('async settleTurn() {', 'async settleTurn(event = {}) {');
+patch('this.pendingTurn?.resolve(reason);\n    this.pendingTurn = null;', `const failure = event.failure || this.stepFailure;
+    if (failure && !this.cancelRequested) {
+      this.pendingTurn?.reject(RequestError2.internalError({}, typeof failure === "string" ? failure : JSON.stringify(failure)));
+    } else {
+      this.pendingTurn?.resolve(reason);
+    }
+    this.pendingTurn = null;`);
+patch('void this.settleTurn();', 'void this.settleTurn(ev);');
+patch('this.pendingTurn?.resolve(reason);\n        }', 'if (this.cancelRequested) this.pendingTurn?.resolve("cancelled");\n          else this.pendingTurn?.reject(RequestError2.internalError({}, String(err?.message ?? err)));\n        }');
+
+const wrapper = join(bin, 'step-code-rpc');
+source = source.replace('#!/usr/bin/env node\n', `// Derived from pi-acp ${version} (MIT); see node_modules/pi-acp/LICENSE.\nprocess.env.PI_ACP_PI_COMMAND = ${JSON.stringify(wrapper)};\nprocess.env.PATH = ${JSON.stringify(dirname(process.execPath))} + ":" + (process.env.PATH || "");\n`);
+await writeFile(join(generated, 'adapter.mjs'), source);
+const quote = value => "'" + value.replaceAll("'", "'\\''") + "'";
+for (const [name, target] of [['step-code-acp', join(generated, 'adapter.mjs')], ['step-code-rpc', join(root, 'step-rpc.mjs')]]) {
+  const file = join(bin, name);
+  await writeFile(file, `#!/bin/sh\nexec ${quote(process.execPath)} ${quote(target)} "$@"\n`);
+  await chmod(file, 0o755);
+}
+console.log('Built Step Code ACP launchers with ' + process.execPath);
