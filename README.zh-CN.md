@@ -92,6 +92,12 @@ npm run setup
 
 本项目不会修改 T3 前端，也不提供强制换图标的启动器。
 
+## 安全与数据流
+
+请使用 v0.2.2 或更新版本：它升级了存在安全公告的 Zod 依赖，限制 ACP 输入的大小和结构，并避免在诊断日志中输出原始请求或 Step Code RPC 的原始 stderr。交互式登录仍使用 Step Code 自己的界面。具体限制和测试范围见 [SECURITY.md](SECURITY.md)。旧的解压发行包不会随源码更新自动修复。
+
+本地运行适配器不代表模型也在本地运行。提示词、项目内容和工具结果可能发送给 Step Code 以及你委派的 T3 子任务所配置的模型服务。只在可信客户端、项目和 Step Code 安装中使用，不要公开本地 MCP 端点或其会话令牌。
+
 ## 兼容范围与协作
 
 本机验证过 macOS、Node 24.15.0、T3 0.1.7、Step Code 0.1.6 和 Step 5 Preview；Linux 发行包也通过了构建与启动检查。0.1.7 是已验证的 T3 版本，基础 ACP 接入没有写死该版本。协议、Step Code RPC 或 T3 MCP 工具变化时，仍可能需要适配和复测。
@@ -111,4 +117,4 @@ npm run smoke:mcp -- --stdio-descriptor
 
 源码安装可用 `npm run uninstall` 移除当前安装创建的入口链接。发行包安装请先在客户端移除 Provider，再删除解压目录。Step Code 自己的配置、认证、会话和 T3 历史仍保留在原位置。
 
-代码采用 MIT 许可证；上游和品牌素材说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。已知依赖公告见 [SECURITY.md](SECURITY.md)。
+代码采用 MIT 许可证；上游和品牌素材说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。安全修复与限制见 [SECURITY.md](SECURITY.md)。

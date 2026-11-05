@@ -27,4 +27,6 @@ SOFTWARE.
 
 T3 Code and Step Code are separate upstream projects. They are not bundled or redistributed.
 
+The ACP TypeScript SDK 0.26.0 is licensed under Apache-2.0. Its original license remains at `node_modules/@agentclientprotocol/sdk/LICENSE`. The build creates a modified runtime copy at `.generated/acp-sdk/`, with the same license retained there. The modified `acp.js` omits diagnostic payloads; `stream.js` delegates to this project's bounded JSONL transport. These changes are local to the adapter and are not upstream SDK releases. Other bundled dependencies and the Node runtime retain their own licenses.
+
 The Step logo asset is supplied for identification of Step Code. Brand assets are excluded from this project’s MIT code license. The Registry SVG is a monochrome vector rendering of the mark in https://avatars.githubusercontent.com/u/178004800?s=256&v=4, provided by the project owner. No ownership of the Step mark is claimed.

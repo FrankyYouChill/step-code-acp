@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir, chmod } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, chmod, cp, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -11,6 +11,28 @@ const generated = join(root, '.generated');
 const bin = join(root, 'bin');
 await mkdir(generated, { recursive: true });
 await mkdir(bin, { recursive: true });
+// Keep the original SDK installed and licensed. Generate a private runtime copy
+// with payload-free diagnostics rather than changing console behavior globally.
+const sdkRoot = join(root, 'node_modules/@agentclientprotocol/sdk');
+const sdkVersion = JSON.parse(await readFile(join(sdkRoot, 'package.json'), 'utf8')).version;
+if (sdkVersion !== '0.26.0') throw new Error('Review SDK security patches before changing its version');
+const safeSdk = join(generated, 'acp-sdk');
+await rm(safeSdk, {recursive:true, force:true});
+await cp(join(sdkRoot, 'dist'), safeSdk, {recursive:true});
+await cp(join(sdkRoot, 'LICENSE'), join(safeSdk, 'LICENSE'));
+let sdkSource = await readFile(join(safeSdk, 'acp.js'), 'utf8');
+for (const before of [
+  'console.error("Unexpected error during message processing:", message, err);',
+  'console.error("Error handling request", message, response.error);',
+  'console.error("Error handling notification", message, response.error);',
+  'console.error("Invalid message", { message });',
+  'console.error("Got response to unknown request", response.id);',
+]) {
+  if (!sdkSource.includes(before)) throw new Error('SDK diagnostic patch no longer matches');
+  sdkSource = sdkSource.replace(before, 'console.error("ACP request failed; diagnostic payload omitted.");');
+}
+await writeFile(join(safeSdk, 'acp.js'), '// Modified for payload-free diagnostics; see THIRD_PARTY_NOTICES.md.\n' + sdkSource);
+await writeFile(join(safeSdk, 'stream.js'), '// Local bounded transport; original SDK license retained in this directory.\nexport { ndJsonStream } from "../../acp-transport.mjs";\n');
 let source = await readFile(join(root, 'node_modules/pi-acp/dist/index.js'), 'utf8');
 const version = JSON.parse(await readFile(join(root, 'node_modules/pi-acp/package.json'), 'utf8')).version;
 if (version !== '0.0.34') throw new Error('Review compatibility patches before changing pi-acp version');
@@ -30,10 +52,13 @@ patch('cwd: params.cwd,\n        piCommand: params.piCommand',
   'cwd: params.cwd,\n        mcpServers: params.mcpServers,\n        piCommand: params.piCommand');
 patch('cwd,\n          sessionPath: stored.sessionFile,',
   'cwd,\n          mcpServers: opts?.mcpServers ?? [],\n          sessionPath: stored.sessionFile,');
-patch('child.stderr.on("data", () => {\n    });', String.raw`child.stderr.on("data", (chunk) => {
-      const clean = String(chunk).replace(/Bearer\s+[^\s"\\]+/gi, "Bearer [redacted]").replace(/sk-[A-Za-z0-9_-]+/g, "[redacted]");
-      process.stderr.write(clean);
+patch('child.stderr.on("data", () => {\n    });', `let reportedDiagnostic = false;
+    child.stderr.on("data", () => {
+      if (!reportedDiagnostic) process.stderr.write("Step Code emitted diagnostic output; content omitted for privacy.\\n");
+      reportedDiagnostic = true;
     });`);
+source = source.replaceAll('from "@agentclientprotocol/sdk"', 'from "./acp-sdk/acp.js"');
+source = source.replaceAll('pi process exited', 'Step Code process exited').replaceAll('pi returned a thinking level', 'Step Code returned a thinking level');
 patch('name: pkg.name ?? "pi-acp",', 'name: "step-code-acp",');
 patch('title: "pi ACP adapter",', 'title: "Step Code (local ACP adapter)",');
 patch('return join(homedir(), ".pi", "pi-acp");', 'return process.env.STEP_CODE_ACP_HOME || join(homedir(), ".stepcode", "t3-acp");');

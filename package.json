@@ -1,6 +1,6 @@
 {
   "name": "@frankyyouchill/step-code-acp",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Community ACP adapter for the installed Step Code CLI, with a session-scoped T3 orchestration bridge",
   "type": "module",
   "private": true,
@@ -17,12 +17,17 @@
     "build": "node prepare-adapter.mjs",
     "setup": "npm run build && node scripts/install.mjs",
     "uninstall": "node scripts/install.mjs --uninstall",
-    "test": "node --test test-t3-mcp.mjs && node smoke-acp.mjs --simulate-failure",
+    "test": "node --test test-t3-mcp.mjs test-security.mjs && node smoke-acp.mjs --simulate-failure",
     "smoke": "node smoke-acp.mjs",
     "smoke:mcp": "node smoke-t3-mcp.mjs",
-    "package": "node scripts/package-release.mjs"
+    "package": "node scripts/package-release.mjs",
+    "audit:public": "node scripts/check-public.mjs"
   },
   "dependencies": {
     "pi-acp": "0.0.34"
+  },
+  "overrides": {
+    "@agentclientprotocol/sdk": "0.26.0",
+    "zod": "4.6.7"
   }
 }

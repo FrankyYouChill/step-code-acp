@@ -6,7 +6,7 @@ This community adapter connects ACP to Step Code's RPC interface. Step Code hand
 
 [Chinese guide](README.zh-CN.md)
 
-**Community preview:** independently maintained, built on [pi-acp 0.0.34](https://github.com/svkozak/pi-acp). This is not an official StepFun or T3 release. See [architecture and limitations](docs/architecture.md), [Registry status](docs/registry.md), and the [dependency advisory](SECURITY.md).
+**Community preview:** independently maintained, built on [pi-acp 0.0.34](https://github.com/svkozak/pi-acp). This is not an official StepFun or T3 release. See [architecture and limitations](docs/architecture.md), [Registry status](docs/registry.md), and the [security notes](SECURITY.md). Use v0.2.2 or later for the input-validation and diagnostic-privacy fixes.
 
 ## 1. Install and sign in to Step Code
 
@@ -77,7 +77,9 @@ Brand assets are excluded from the MIT code license. See [third-party notices](T
 
 When T3 exposes its session-scoped MCP tools, the adapter loads a Step Code extension that can discover capabilities and delegate to other T3 providers, including OpenCode. These are T3-managed child tasks. Availability depends on the client, tool catalog, account access, and approval settings.
 
-The bridge accepts only T3's loopback `t3-code` endpoint, consumes T3 0.1.7's `acp-mcp-bridge` descriptor without executing its supplied command, and keeps its bearer token in process memory. It does not activate arbitrary remote MCP servers or disable tool approvals.
+The bridge accepts only T3's loopback `t3-code` endpoint and consumes T3 0.1.7's `acp-mcp-bridge` descriptor without executing its supplied command. Its session-scoped bearer token is passed in process memory; the adapter does not write that configuration to disk. RPC diagnostics omit raw child stderr and SDK request payloads. It does not activate arbitrary remote MCP servers or disable tool approvals. See [security notes and input limits](SECURITY.md).
+
+Prompts, project content and tool results may reach the model providers configured for Step Code and any T3 tasks you delegate. Choose providers and projects accordingly; local execution does not mean local-only model processing.
 
 ## Compatibility and verification
 
@@ -86,6 +88,8 @@ Locally verified with macOS, Node 24.15.0, T3 Code 0.1.7, Step Code 0.1.6, and S
 ```sh
 npm run build
 npm test                                  # local fixtures; no model spend
+npm run audit:public                      # focused public-file/metadata checks
+npm audit --omit=dev --audit-level=moderate # current dependency advisories
 npm run smoke                             # real model read/write using your own access
 npm run smoke:mcp -- --stdio-descriptor    # real model + local MCP fixture
 npm run package                           # create an archive for the current platform

@@ -1,4 +1,4 @@
-import { mkdtemp, readdir, rm, writeFile, chmod, realpath } from 'node:fs/promises';
+import { mkdtemp, readdir, rm, writeFile, chmod, realpath, readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -22,6 +22,10 @@ try {
   const binary = join(relocated, 'step-code-acp');
   const run = spawnSync(process.execPath, [join(root,'smoke-acp.mjs'),'--simulate-failure'], {env:{...process.env,STEP_CODE_ACP_BINARY:binary},encoding:'utf8',timeout:120000});
   assert.equal(run.status, 0, run.stderr || run.stdout);
+  const bundledZod=JSON.parse(await readFile(join(relocated,'node_modules/zod/package.json'),'utf8'));
+  assert.equal(bundledZod.version,'4.6.7');
+  const security = spawnSync(process.execPath,['--test',join(root,'test-security.mjs')],{env:{...process.env,STEP_CODE_ACP_BINARY:binary},encoding:'utf8',timeout:30000});
+  assert.equal(security.status,0,security.stderr || security.stdout);
   const initialize = JSON.parse(run.stdout.split('\n').find(line => line.startsWith('{')));
   assert.equal(initialize.agentInfo.name, 'step-code-acp');
   const terminal = initialize.authMethods.find(method => method.type === 'terminal');
@@ -34,7 +38,7 @@ try {
   const auth = spawnSync(binary, ['--terminal-login'], {env:{...process.env,STEP_CODE_BINARY:fixture},encoding:'utf8',timeout:15000});
   assert.equal(auth.status, 0, auth.stderr);
   assert.ok(auth.stdout.includes('STEP_TERMINAL_AUTH_FIXTURE_OK'));
-  console.log('Release archive passed relocated ACP startup, provider-failure propagation, and terminal-auth launch checks.');
+  console.log('Release archive passed relocated startup, security regressions, provider-failure propagation, patched dependency and terminal-auth checks.');
 } finally {
   await rm(temporary, {recursive:true,force:true});
 }
