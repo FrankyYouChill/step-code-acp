@@ -1,8 +1,8 @@
 # ACP Registry status
 
-**Status: preparing the initial submission.** This page will link the review request once it is open. A published release does not imply Registry acceptance or endorsement.
+**Status: submitted for review in [ACP Registry PR #752](https://github.com/agentclientprotocol/registry/pull/752).** The entry is not yet accepted or published in the Registry. A published adapter release does not imply Registry acceptance or endorsement.
 
-The proposed entry is `step-code-acp`, displayed as **Step Code ACP**, and points to this repository's pinned release archives. Users must have Step Code installed and configure their own account access. The adapter declares terminal authentication and launches the installed Step Code CLI for sign-in.
+The proposed entry is `step-code-acp`, displayed as **Step Code ACP**, and points to the pinned [v0.2.1 release archives](https://github.com/FrankyYouChill/step-code-acp/releases/tag/v0.2.1) for macOS Apple Silicon and Linux x86_64. Users must have Step Code installed and configure their own account access. The adapter declares terminal authentication and launches the installed Step Code CLI for sign-in.
 
 The entry and icon are maintained under `registry/step-code-acp/`. The icon uses the Registry's required 16×16 monochrome `currentColor` SVG format, based on the Step mark supplied by the project owner. Brand ownership remains with its owner.
 
